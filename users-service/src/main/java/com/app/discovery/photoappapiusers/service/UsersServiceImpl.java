@@ -7,6 +7,8 @@ import com.app.discovery.photoappapiusers.shared.UserDto;
 import com.app.discovery.photoappapiusers.ui.model.AlbumResponseModel;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.env.Environment;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -21,6 +23,7 @@ import java.util.UUID;
 @Service
 public class UsersServiceImpl implements UsersService {
 
+    private final Logger log = LoggerFactory.getLogger(getClass());
     private final UsersRepository usersRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final AlbumsServiceClient albumsServiceClient;
@@ -82,7 +85,10 @@ public class UsersServiceImpl implements UsersService {
             throw new UsernameNotFoundException("User not found");
         }
 
+
+        log.info("Before calling albums microservice");
         List<AlbumResponseModel> albumsList = albumsServiceClient.getAlbums(userId);
+        log.info("after calling albums microservice");
 
         UserDto userDto = new ModelMapper().map(userEntity, UserDto.class);
         userDto.setAlbums(albumsList);
